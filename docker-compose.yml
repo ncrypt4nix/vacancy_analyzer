@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+    scrapyd: &scrapyd
+        build: scrapyd/
+        container_name: scrapyd
+        restart: always
+        volumes:
+            - logs-scrapy:/srv/logs
+            - ./static/proxy_list.txt:/srv/project/proxy_list.txt
+        environment:
+            - REDIS_PASSWORD
+
+    scrapy-deploy:
+        <<: *scrapyd
+        command: scrapyd-deploy
+        container_name: scrapyd-deploy
+        restart: "no"
+        depends_on:
+            - scrapyd
+
+    redis-scrapy:
+        image: redis:alpine
+        container_name: redis-scrapy
+        restart: on-failure
+        command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+
+volumes:
+    logs-scrapy: {}
