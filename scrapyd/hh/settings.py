@@ -49,7 +49,10 @@ RETRY_HTTP_CODES = [500, 503, 504, 400, 403, 404, 408]
 LOG_FILE = os.path.join(PROJECT_DIR, 'logs', 'scrapy.log')
 LOG_LEVEL = 'INFO'
 
+# Redis conf
 REDIS_PREFIX = 'hh'
+REDIS_HOST = os.getenv('REDIS_HOST', 'redis-scrapy')
+REDIS_PORT = os.getenv('REDIS_PORT', '6379')
 REDIS_PASSWORD = os.getenv('REDIS_PASSWORD')
 
 MAIN_HH_DOMAIN = 'hh.ru'

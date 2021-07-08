@@ -4,7 +4,7 @@ import redis
 import logging
 from itemadapter import ItemAdapter
 
-from hh.settings import REDIS_PASSWORD, REDIS_PREFIX, MAIN_HH_DOMAIN
+from hh import settings
 
 
 logger = logging.getLogger()
@@ -16,10 +16,10 @@ class HhPipeline:
 
     def open_spider(self, spider):
         self.reader = redis.StrictRedis(
-            host='redis-scrapy',
-            port='6379',
+            host=settings.REDIS_HOST,
+            port=settings.REDIS_PORT,
             db=0,
-            password=REDIS_PASSWORD
+            password=settings.REDIS_PASSWORD
         )
 
     def process_item(self, item, spider):
@@ -33,11 +33,11 @@ class HhPipeline:
         return item
 
     def get_key_to_reader(self, item):
-        math = re.search(rf'{MAIN_HH_DOMAIN}\/vacancy\/(\d+)', item['url'])
+        math = re.search(rf'{settings.MAIN_HH_DOMAIN}\/vacancy\/(\d+)', item['url'])
         if not math:
             raise self.KeyNotFound
         id = math.group(1)
-        return '_'.join([REDIS_PREFIX, id])
+        return '_'.join([settings.REDIS_PREFIX, id])
 
     def normalize_item(self, item):
         item['wage'] = item['wage'].replace(u'\xa0', u' ')

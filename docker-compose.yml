@@ -7,15 +7,18 @@ services:
         restart: always
         volumes:
             - logs-scrapy:/srv/logs
-            - ./static/proxy_list.txt:/srv/project/proxy_list.txt
         environment:
+            - REDIS_HOST
+            - REDIS_PORT
             - REDIS_PASSWORD
 
     scrapy-deploy:
         <<: *scrapyd
         command: scrapyd-deploy
         container_name: scrapyd-deploy
-        restart: "no"
+        restart: no
+        volumes:
+            - ./static/proxy_list.txt:/srv/project/proxy_list.txt
         depends_on:
             - scrapyd
 
