@@ -40,5 +40,5 @@ class HhPipeline:
         return '_'.join([REDIS_PREFIX, id])
 
     def normalize_item(self, item):
-        item['wage'].replace(u'\xa0', u' ')
+        item['wage'] = item['wage'].replace(u'\xa0', u' ')
         return item
