@@ -20,6 +20,8 @@ class HHSpider(scrapy.Spider):
 
     def __init__(self, search=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if not search:
+            logger.error('You forgot to specify a parsing keyword')
         self._start_url = self._start_url.format(search=search)
         logger.info(f'Parse for search text: {search}')
         self.start_urls = [self._start_url]

@@ -1,32 +1,45 @@
 version: '3.8'
 
 services:
-    scrapyd: &scrapyd
+    scrapy: &scrapy
         build: scrapyd/
-        container_name: scrapyd
-        restart: always
+        command: exit 0
         volumes:
             - logs-scrapy:/srv/logs
+            - ./static/proxy_list.txt:/srv/project/proxy_list.txt
         environment:
             - REDIS_HOST
             - REDIS_PORT
             - REDIS_PASSWORD
+            - KEYWORD
 
-    scrapy-deploy:
-        <<: *scrapyd
-        command: scrapyd-deploy
+    scrapyd:
+        <<: *scrapy
+        command: scrapyd
+        container_name: scrapyd
+        expose:
+            - 6800
+
+    scrapyd-deploy:
+        <<: *scrapy
+        command: python run.py
         container_name: scrapyd-deploy
-        restart: no
-        volumes:
-            - ./static/proxy_list.txt:/srv/project/proxy_list.txt
+        restart: "no"
         depends_on:
             - scrapyd
+        volumes:
+            - ./scrapyd/run.py:/srv/project/run.py
+            - ./static/results:/srv/project/results
+        stdin_open: true
+        tty: true
 
     redis-scrapy:
         image: redis:alpine
         container_name: redis-scrapy
         restart: on-failure
         command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+        expose:
+            - 6379
 
 volumes:
     logs-scrapy: {}
